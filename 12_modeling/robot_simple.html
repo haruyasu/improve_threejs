@@ -44,13 +44,13 @@
             var PI = Math.PI;
             // MATERIALS
             var brownMat = new THREE.MeshStandardMaterial({
-                color: 0x401a07,
+                color: 0x01676b,
                 side: THREE.DoubleSide,
                 shading: THREE.SmoothShading,
                 roughness: 1
             });
             var blackMat = new THREE.MeshPhongMaterial({
-                color: 0x333333,
+                color: 0x4e4e4e,
                 shading: THREE.FlatShading
             });
             var redMat = new THREE.MeshPhongMaterial({
@@ -155,7 +155,7 @@
                 this.handR = new THREE.Mesh(handGeom, skinMat);
                 this.handR.position.z = 7;
                 this.handR.rotation.x = 3;
-                this.handR.position.y = 9;
+                this.handR.position.y = 9.5;
                 this.body.add(this.handR);
                 this.handL = this.handR.clone();
                 this.handL.rotation.x = -3;
@@ -210,6 +210,13 @@
                         object.receiveShadow = true;
                     }
                 });
+
+                var planeGeom = new THREE.PlaneBufferGeometry(50, 50, 32);
+                this.ground = new THREE.Mesh(planeGeom, brownMat);
+                this.ground.rotation.x = Math.PI / 2;
+                this.ground.position.y = -3.1;
+                this.ground.castShadow = true;
+                this.body.add(this.ground);
             };
 
             Hero.prototype.run = function() {
