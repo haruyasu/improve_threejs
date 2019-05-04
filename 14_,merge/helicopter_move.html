@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Helicopter</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+        <style>
+            body {
+                margin: 0px;
+                overflow: hidden;
+            }
+
+            #world {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                background: linear-gradient(#247BA0, #70C1B3);
+            }
+        </style>
+    </head>
+    <body>
+        <div id="world"></div>
+        <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r98/build/three.js"></script>
+        <script>
+            window.addEventListener("load", init, false);
+
+            function init(event) {
+                document.addEventListener("mousemove", handleMouseMove, false);
+                initScreenAnd3D();
+                createLights();
+                createPlane();
+                createSea();
+                loop();
+            }
+
+            //COLORS
+            var Colors = {
+                red: 0xD6A004,
+                white: 0xd8d0d1,
+                pink: 0xf5986e,
+                brown: 0x59332e,
+                brownDark: 0x23190f,
+                blue: 0x68c3c0,
+                yellow: 0xFFE066,
+                black: 0x50514F
+            };
+
+            //INIT THREE JS, SCREEN AND MOUSE EVENTS
+            function initScreenAnd3D() {
+                container = document.getElementById("world");
+                HEIGHT = container.offsetHeight;
+                WIDTH = container.width;
+                scene = new THREE.Scene();
+                scene.fog = new THREE.Fog(0xd6eae6, 150, 300);
+                aspectRatio = WIDTH / HEIGHT;
+                fieldOfView = 60;
+                nearPlane = 1;
+                farPlane = 10000;
+                camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane);
+                scene.fog = new THREE.Fog(0xf7d9aa, 100, 950);
+                camera.position.x = 0;
+                camera.position.z = 200;
+                camera.position.y = 100;
+                renderer = new THREE.WebGLRenderer({
+                    alpha: true,
+                    antialias: true
+                });
+                renderer.setSize(WIDTH, HEIGHT);
+                renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+                renderer.shadowMap.enabled = true;
+                container.appendChild(renderer.domElement);
+                window.addEventListener("resize", handleWindowResize, false);
+                clock = new THREE.Clock();
+                handleWindowResize();
+            }
+            function handleWindowResize() {
+                HEIGHT = container.offsetHeight;
+                WIDTH = container.offsetWidth;
+                renderer.setSize(WIDTH, HEIGHT);
+                camera.aspect = WIDTH / HEIGHT;
+                camera.updateProjectionMatrix();
+            }
+            var ambientLight, hemisphereLight, shadowLight;
+
+            function createLights() {
+                hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9);
+                ambientLight = new THREE.AmbientLight(0xdc8874, 0.5);
+                shadowLight = new THREE.DirectionalLight(0xffffff, 0.9);
+                shadowLight.position.set(150, 350, 350);
+                shadowLight.castShadow = true;
+                shadowLight.shadow.camera.left = -400;
+                shadowLight.shadow.camera.right = 400;
+                shadowLight.shadow.camera.top = 400;
+                shadowLight.shadow.camera.bottom = -400;
+                shadowLight.shadow.camera.near = 1;
+                shadowLight.shadow.camera.far = 1000;
+                shadowLight.shadow.mapSize.width = 2048;
+                shadowLight.shadow.mapSize.height = 2048;
+                scene.add(hemisphereLight);
+                scene.add(shadowLight);
+                scene.add(ambientLight);
+            }
+
+            var AirPlane = function() {
+                this.mesh = new THREE.Object3D();
+                this.mesh.name = "airPlane";
+
+                // Cockpit
+                var geomCockpit = new THREE.BoxGeometry(60, 30, 40, 1, 1, 1);
+                var matCockpit = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
+                var cockpit = new THREE.Mesh(geomCockpit, matCockpit);
+                cockpit.castShadow = true;
+                cockpit.receiveShadow = true;
+                this.mesh.add(cockpit);
+
+                var geomCockpit_2 = new THREE.BoxGeometry(20, 15, 40, 1, 1, 1);
+                var matCockpit_2 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
+                var cockpit_2 = new THREE.Mesh(geomCockpit_2, matCockpit_2);
+                geomCockpit_2.vertices[0].y -= 12;
+                geomCockpit_2.vertices[1].y -= 12;
+                cockpit_2.position.y = 22;
+                cockpit_2.position.x = 20;
+                cockpit_2.castShadow = true;
+                cockpit_2.receiveShadow = true;
+                this.mesh.add(cockpit_2);
+
+                var geomCockpit_3 = new THREE.BoxGeometry(30, 15, 40, 1, 1, 1);
+                var matCockpit_3 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
+                var cockpit_3 = new THREE.Mesh(geomCockpit_3, matCockpit_3);
+                cockpit_3.position.y = 22;
+                cockpit_3.position.x = -5;
+                cockpit_3.castShadow = true;
+                cockpit_3.receiveShadow = true;
+                this.mesh.add(cockpit_3);
+                // propeller plate
+                var geomCockpit_4 = new THREE.BoxGeometry(20, 5, 30, 1, 1, 1);
+                var matCockpit_4 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
+                var cockpit_4 = new THREE.Mesh(geomCockpit_4, matCockpit_4);
+                cockpit_4.position.y = 32;
+                cockpit_4.position.x = -5;
+                cockpit_4.castShadow = true;
+                cockpit_4.receiveShadow = true;
+                this.mesh.add(cockpit_4);
+                // Tail before
+                var geomCockpit_5 = new THREE.BoxGeometry(30, 30, 25, 1, 1, 1);
+                var matCockpit_5 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
+                var cockpit_5 = new THREE.Mesh(geomCockpit_5, matCockpit_5);
+                geomCockpit_5.vertices[6].y += 3;
+                geomCockpit_5.vertices[6].z += 3;
+                geomCockpit_5.vertices[4].z += 3;
+                geomCockpit_5.vertices[7].y += 3;
+                geomCockpit_5.vertices[7].z -= 3;
+                geomCockpit_5.vertices[5].z -= 3;
+                cockpit_5.position.y = 5;
+                cockpit_5.position.x = -35;
+                cockpit_5.castShadow = true;
+                cockpit_5.receiveShadow = true;
+                this.mesh.add(cockpit_5);
+                // Tail
+                var geomCockpit_6 = new THREE.BoxGeometry(80, 15, 15, 1, 1, 1);
+                var matCockpit_6 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
+                var cockpit_6 = new THREE.Mesh(geomCockpit_6, matCockpit_6);
+                geomCockpit_6.vertices[6].y += 10;
+                geomCockpit_6.vertices[6].z += 6;
+                geomCockpit_6.vertices[4].z += 6;
+                geomCockpit_6.vertices[7].y += 10;
+                geomCockpit_6.vertices[7].z -= 6;
+                geomCockpit_6.vertices[5].z -= 6;
+                cockpit_6.position.y = 10;
+                cockpit_6.position.x = -90;
+                cockpit_6.castShadow = true;
+                cockpit_6.receiveShadow = true;
+                this.mesh.add(cockpit_6);
+                // Tail before up
+                var geomCockpit_7 = new THREE.BoxGeometry(20, 7, 15, 1, 1, 1);
+                var matCockpit_7 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
+                var cockpit_7 = new THREE.Mesh(geomCockpit_7, matCockpit_7);
+                geomCockpit_7.vertices[5].y -= 2;
+                geomCockpit_7.vertices[4].y -= 2;
+                cockpit_7.position.y = 23;
+                cockpit_7.position.x = -30;
+                cockpit_7.castShadow = true;
+                cockpit_7.receiveShadow = true;
+                this.mesh.add(cockpit_7);
+
+                var geomCockpit_8 = new THREE.BoxGeometry(10, 20, 1, 1, 1, 1);
+                var matCockpit_8 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
+                var cockpit_8 = new THREE.Mesh(geomCockpit_8, matCockpit_8);
+                geomCockpit_8.vertices[0].x -= 8;
+                geomCockpit_8.vertices[1].x -= 8;
+                cockpit_8.position.y = 25;
+                cockpit_8.position.x = -126.8;
+                cockpit_8.rotation.z = Math.PI / 12;
+
+                cockpit_8.castShadow = true;
+                cockpit_8.receiveShadow = true;
+                this.mesh.add(cockpit_8);
+
+                var geomCockpit_9 = new THREE.BoxGeometry(10, 15, 1, 1, 1, 1);
+                var matCockpit_9 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
+                var cockpit_9 = new THREE.Mesh(geomCockpit_9, matCockpit_9);
+                geomCockpit_9.vertices[2].x -= 8;
+                geomCockpit_9.vertices[3].x -= 8;
+                cockpit_9.position.y = 5.5;
+                cockpit_9.position.x = -126.8;
+                cockpit_9.rotation.z = -Math.PI / 12;
+                cockpit_9.castShadow = true;
+                cockpit_9.receiveShadow = true;
+                this.mesh.add(cockpit_9);
+
+                // Engine
+                var geomEngine = new THREE.BoxGeometry(30, 20, 42, 1, 1, 1);
+                // var matEngine = new THREE.MeshPhongMaterial({ color: Colors.white, shading: THREE.FlatShading });
+
+                var matEngine = new THREE.MeshPhongMaterial({
+                    color: Colors.blue,
+                    transparent: true,
+                    opacity: 0.5,
+                    shading: THREE.FlatShading
+                });
+
+                var engine = new THREE.Mesh(geomEngine, matEngine);
+                engine.position.x = 16;
+                engine.position.y = 4;
+                engine.position.z = 0;
+                engine.castShadow = true;
+                engine.receiveShadow = true;
+                this.mesh.add(engine);
+
+                // wheel bar
+                var geomBar= new THREE.BoxGeometry(60, 2, 3, 1, 1, 1);
+                var matBar = new THREE.MeshPhongMaterial({ color: Colors.brown, shading: THREE.FlatShading });
+                var barL = new THREE.Mesh(geomBar, matBar);
+                barL.position.y = -22;
+                barL.position.z = -20;
+                barL.castShadow = true;
+                barL.receiveShadow = true;
+                this.mesh.add(barL);
+                var barR = barL.clone();
+                barR.position.z = -barL.position.z;
+                this.mesh.add(barR);
+
+                // legs
+                var geomleg= new THREE.BoxGeometry(3, 9, 1, 1, 1, 1);
+                var matLeg = new THREE.MeshPhongMaterial({ color: Colors.brown, shading: THREE.FlatShading });
+                var legLF = new THREE.Mesh(geomleg, matLeg);
+                legLF.position.x = 17;
+                legLF.position.y = -17;
+                legLF.position.z = -19;
+                legLF.rotation.x = Math.PI / 12;
+                legLF.castShadow = true;
+                legLF.receiveShadow = true;
+                this.mesh.add(legLF);
+                var legLB = legLF.clone();
+                legLB.position.x = -legLF.position.x;
+                this.mesh.add(legLB);
+                var legRF = legLF.clone();
+                legRF.position.z = -legLF.position.z;
+                legRF.rotation.x = -legLF.rotation.x
+                this.mesh.add(legRF);
+                var legRB = legRF.clone();
+                legRB.position.x = -legLF.position.x;
+                this.mesh.add(legRB);
+                // Propller
+                var geomPropeller = new THREE.BoxGeometry(20, 5, 5, 1, 1, 1);
+                geomPropeller.vertices[4].y -= 2;
+                geomPropeller.vertices[4].z += 2;
+                geomPropeller.vertices[5].y -= 2;
+                geomPropeller.vertices[5].z -= 2;
+                geomPropeller.vertices[6].y += 2;
+                geomPropeller.vertices[6].z += 2;
+                geomPropeller.vertices[7].y += 2;
+                geomPropeller.vertices[7].z -= 2;
+                var matPropeller = new THREE.MeshPhongMaterial({ color: Colors.brown, shading: THREE.FlatShading });
+                this.propeller = new THREE.Mesh(geomPropeller, matPropeller);
+                this.propeller.rotation.z = Math.PI / 2;
+                this.propeller.castShadow = true;
+                this.propeller.receiveShadow = true;
+
+                var geomBlade = new THREE.BoxGeometry(1, 140, 8, 1, 1, 1);
+                var matBlade = new THREE.MeshPhongMaterial({ color: Colors.brownDark, shading: THREE.FlatShading });
+                var blade1 = new THREE.Mesh(geomBlade, matBlade);
+                blade1.position.set(8, 0, 0);
+                blade1.castShadow = true;
+                blade1.receiveShadow = true;
+                var blade2 = blade1.clone();
+                blade2.rotation.x = Math.PI / 2;
+                blade2.castShadow = true;
+                blade2.receiveShadow = true;
+                this.propeller.add(blade1);
+                this.propeller.add(blade2);
+                this.propeller.position.set(-5, 35, 0);
+                this.mesh.add(this.propeller);
+
+                // Propeller tail
+                var geomPropeller_tail = new THREE.BoxGeometry(5, 2, 2, 1, 1, 1);
+                geomPropeller_tail.vertices[4].y -= 1;
+                geomPropeller_tail.vertices[4].z += 1;
+                geomPropeller_tail.vertices[5].y -= 1;
+                geomPropeller_tail.vertices[5].z -= 1;
+                geomPropeller_tail.vertices[6].y += 1;
+                geomPropeller_tail.vertices[6].z += 1;
+                geomPropeller_tail.vertices[7].y += 1;
+                geomPropeller_tail.vertices[7].z -= 1;
+                var matPropeller_tail = new THREE.MeshPhongMaterial({ color: Colors.brown, shading: THREE.FlatShading });
+                this.propeller_tail = new THREE.Mesh(geomPropeller_tail, matPropeller_tail);
+                this.propeller_tail.rotation.z = Math.PI / 2;
+                this.propeller_tail.rotation.x = -Math.PI / 2;
+                this.propeller_tail.castShadow = true;
+                this.propeller_tail.receiveShadow = true;
+
+                var geomBlade_tail = new THREE.BoxGeometry(1, 30, 2, 1, 1, 1);
+                var matBlade_tail = new THREE.MeshPhongMaterial({ color: Colors.brownDark, shading: THREE.FlatShading });
+                var blade1_tail = new THREE.Mesh(geomBlade_tail, matBlade_tail);
+                blade1_tail.position.set(1.5, 0, 0);
+                blade1_tail.castShadow = true;
+                blade1_tail.receiveShadow = true;
+                var blade2_tail = blade1_tail.clone();
+                blade2_tail.rotation.x = Math.PI / 2;
+                blade2_tail.castShadow = true;
+                blade2_tail.receiveShadow = true;
+                this.propeller_tail.add(blade1_tail);
+                this.propeller_tail.add(blade2_tail);
+                this.propeller_tail.position.set(-125, 15, -3);
+                this.mesh.add(this.propeller_tail);
+
+
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+            };
+
+            AirPlane.prototype.run = function() {
+                airplane.propeller.rotation.y += 0.3;
+                airplane.propeller_tail.rotation.y += 0.3;
+            };
+
+
+            Sea = function() {
+                var geom = new THREE.SphereGeometry(600, 60, 60);
+                geom.applyMatrix(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
+                geom.mergeVertices();
+                var l = geom.vertices.length;
+                this.waves = [];
+                for (var i = 0; i < l; i++) {
+                    var v = geom.vertices[i];
+                    this.waves.push({
+                        y: v.y,
+                        x: v.x,
+                        z: v.z,
+                        ang: Math.random() * Math.PI * 2,
+                        amp: 5 + Math.random() * 2,
+                        speed: 0.016 + Math.random() * 0.032
+                    });
+                }
+                var mat = new THREE.MeshPhongMaterial({
+                    color: Colors.brown,
+                    transparent: true,
+                    opacity: 0.9,
+                    shading: THREE.FlatShading
+                });
+
+                this.mesh = new THREE.Mesh(geom, mat);
+                this.mesh.receiveShadow = true;
+            };
+
+            Sea.prototype.moveWaves = function() {
+                var verts = this.mesh.geometry.vertices;
+                var l = verts.length;
+                for (var i = 0; i < l; i++) {
+                    var v = verts[i];
+                    var vprops = this.waves[i];
+                    v.x = vprops.x + Math.cos(vprops.ang) * vprops.amp;
+                    v.y = vprops.y + Math.sin(vprops.ang) * vprops.amp;
+                    vprops.ang += vprops.speed;
+                }
+                this.mesh.geometry.verticesNeedUpdate = true;
+                sea.mesh.rotation.z += 0.002;
+            };
+
+
+
+            function createPlane() {
+                airplane = new AirPlane();
+                p_scale = 0.3;
+                airplane.mesh.scale.set(p_scale, p_scale, p_scale);
+                // airplane.mesh.position.y = 100;
+                scene.add(airplane.mesh);
+            }
+
+            function createSea() {
+                sea = new Sea();
+                sea.mesh.position.y = -600;
+                scene.add(sea.mesh);
+            }
+
+            function updatePlane() {
+                var targetY = normalize(mousePos.y, -0.75, 0.75, 25, 175);
+                var targetX = normalize(mousePos.x, -0.75, 0.75, -100, 100);
+                airplane.mesh.position.y += (targetY - airplane.mesh.position.y) * 0.1;
+                airplane.mesh.rotation.z = (targetY - airplane.mesh.position.y) * 0.0128;
+                airplane.mesh.rotation.x = (airplane.mesh.position.y - targetY) * 0.0064;
+            }
+
+            function updateCameraFov() {
+                camera.fov = normalize(mousePos.x, -1, 1, 40, 80);
+                camera.updateProjectionMatrix();
+            }
+
+            function normalize(v, vmin, vmax, tmin, tmax) {
+                var nv = Math.max(Math.min(v, vmax), vmin);
+                var dv = vmax - vmin;
+                var pc = (nv - vmin) / dv;
+                var dt = tmax - tmin;
+                var tv = tmin + pc * dt;
+                return tv;
+            }
+
+            var mousePos = { x: 0, y: 0 };
+
+            function handleMouseMove(event) {
+                var tx = -1 + (event.clientX / WIDTH) * 2;
+                var ty = 1 - (event.clientY / HEIGHT) * 2;
+                mousePos = { x: tx, y: ty };
+            }
+
+            var sea;
+            var airplane;
+
+            function loop() {
+                airplane.run();
+                sea.moveWaves();
+                updatePlane();
+                updateCameraFov();
+                renderer.render(scene, camera);
+                requestAnimationFrame(loop);
+            }
+        </script>
+    </body>
+</html>
