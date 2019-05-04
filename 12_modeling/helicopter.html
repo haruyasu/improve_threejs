@@ -138,7 +138,7 @@
                 cockpit_3.castShadow = true;
                 cockpit_3.receiveShadow = true;
                 this.mesh.add(cockpit_3);
-
+                // propeller plate
                 var geomCockpit_4 = new THREE.BoxGeometry(20, 5, 30, 1, 1, 1);
                 var matCockpit_4 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
                 var cockpit_4 = new THREE.Mesh(geomCockpit_4, matCockpit_4);
@@ -147,16 +147,22 @@
                 cockpit_4.castShadow = true;
                 cockpit_4.receiveShadow = true;
                 this.mesh.add(cockpit_4);
-
+                // Tail before
                 var geomCockpit_5 = new THREE.BoxGeometry(30, 30, 25, 1, 1, 1);
                 var matCockpit_5 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
                 var cockpit_5 = new THREE.Mesh(geomCockpit_5, matCockpit_5);
+                geomCockpit_5.vertices[6].y += 3;
+                geomCockpit_5.vertices[6].z += 3;
+                geomCockpit_5.vertices[4].z += 3;
+                geomCockpit_5.vertices[7].y += 3;
+                geomCockpit_5.vertices[7].z -= 3;
+                geomCockpit_5.vertices[5].z -= 3;
                 cockpit_5.position.y = 5;
                 cockpit_5.position.x = -35;
                 cockpit_5.castShadow = true;
                 cockpit_5.receiveShadow = true;
                 this.mesh.add(cockpit_5);
-
+                // Tail
                 var geomCockpit_6 = new THREE.BoxGeometry(80, 15, 15, 1, 1, 1);
                 var matCockpit_6 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
                 var cockpit_6 = new THREE.Mesh(geomCockpit_6, matCockpit_6);
@@ -166,16 +172,17 @@
                 geomCockpit_6.vertices[7].y += 10;
                 geomCockpit_6.vertices[7].z -= 6;
                 geomCockpit_6.vertices[5].z -= 6;
-
                 cockpit_6.position.y = 10;
                 cockpit_6.position.x = -90;
                 cockpit_6.castShadow = true;
                 cockpit_6.receiveShadow = true;
                 this.mesh.add(cockpit_6);
-
+                // Tail before up
                 var geomCockpit_7 = new THREE.BoxGeometry(20, 7, 15, 1, 1, 1);
                 var matCockpit_7 = new THREE.MeshPhongMaterial({ color: Colors.red, shading: THREE.FlatShading });
                 var cockpit_7 = new THREE.Mesh(geomCockpit_7, matCockpit_7);
+                geomCockpit_7.vertices[5].y -= 2;
+                geomCockpit_7.vertices[4].y -= 2;
                 cockpit_7.position.y = 23;
                 cockpit_7.position.x = -30;
                 cockpit_7.castShadow = true;
@@ -336,7 +343,7 @@
             function createPlane() {
                 airplane = new AirPlane();
                 p_scale = 0.5;
-                airplane.mesh.scale.set(p_scale, p_scale, p_scale);
+                // airplane.mesh.scale.set(p_scale, p_scale, p_scale);
                 scene.add(airplane.mesh);
             }
 
