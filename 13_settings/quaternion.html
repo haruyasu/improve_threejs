@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>GoldFish</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+        <style>
+            body {
+                margin: 0px;
+                overflow: hidden;
+            }
+
+            #world {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                background: linear-gradient(#247ba0, #70c1b3);
+            }
+        </style>
+    </head>
+    <body>
+        <div id="world"></div>
+        <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r104/build/three.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r104/examples/js/controls/OrbitControls.js"></script>
+        <script>
+            window.addEventListener("load", init, false);
+
+            function init(event) {
+                initScreenAnd3D();
+                createControls();
+                createLights();
+                createFish();
+                loop();
+            }
+
+            //COLORS
+            var Colors = {
+                red: 0xea4335,
+                white: 0xd8d0d1,
+                pink: 0xf5986e,
+                brown: 0x59332e,
+                brownDark: 0x23190f,
+                blue: 0x68c3c0,
+                yellow: 0xffe066,
+                black: 0x50514f
+            };
+
+            // Materials
+            var blackMat = new THREE.MeshPhongMaterial({
+                color: 0x333333,
+                shading: THREE.FlatShading
+            });
+
+            var brownMat = new THREE.MeshPhongMaterial({
+                color: 0xccb8b9,
+                shininess: 0,
+                shading: THREE.FlatShading
+            });
+
+            var greenMat = new THREE.MeshPhongMaterial({
+                color: 0x7abf8e,
+                shininess: 0,
+                shading: THREE.FlatShading
+            });
+
+            var whitepinkMat = new THREE.MeshPhongMaterial({
+                color: 0xf3981d, //0xb43b29,//0xff5b49,
+                shininess: 0,
+                shading: THREE.FlatShading
+            });
+
+            var pinkMat = new THREE.MeshPhongMaterial({
+                color: 0xffc0cb, //0xb43b29,//0xff5b49,
+                shininess: 0,
+                shading: THREE.FlatShading
+            });
+
+            var lightBrownMat = new THREE.MeshPhongMaterial({
+                color: 0xe07a57,
+                shading: THREE.FlatShading
+            });
+
+            var whiteMat = new THREE.MeshPhongMaterial({
+                color: 0xffffff,
+                shading: THREE.FlatShading
+            });
+            var skinMat = new THREE.MeshPhongMaterial({
+                color: 0xff9ea5,
+                shading: THREE.FlatShading
+            });
+
+            // Controls
+            function createControls() {
+                controls = new THREE.OrbitControls(camera, container);
+            }
+
+            //INIT THREE JS, SCREEN AND MOUSE EVENTS
+            function initScreenAnd3D() {
+                container = document.getElementById("world");
+                HEIGHT = container.offsetHeight;
+                WIDTH = container.width;
+                scene = new THREE.Scene();
+                scene.fog = new THREE.Fog(0xd6eae6, 150, 300);
+                aspectRatio = WIDTH / HEIGHT;
+                fieldOfView = 60;
+                nearPlane = 1;
+                farPlane = 10000;
+                camera = new THREE.PerspectiveCamera(fieldOfView, aspectRatio, nearPlane, farPlane);
+                scene.fog = new THREE.Fog(0xf7d9aa, 100, 950);
+                camera.position.x = 0;
+                camera.position.z = 200;
+                camera.position.y = 100;
+                renderer = new THREE.WebGLRenderer({
+                    alpha: true,
+                    antialias: true
+                });
+                renderer.setSize(WIDTH, HEIGHT);
+                renderer.setPixelRatio(window.devicePixelRatio ? window.devicePixelRatio : 1);
+                renderer.shadowMap.enabled = true;
+                container.appendChild(renderer.domElement);
+                window.addEventListener("resize", handleWindowResize, false);
+                clock = new THREE.Clock();
+                handleWindowResize();
+                var axesHelper = new THREE.AxesHelper(50);
+                scene.add( axesHelper );
+            }
+            function handleWindowResize() {
+                HEIGHT = container.offsetHeight;
+                WIDTH = container.offsetWidth;
+                renderer.setSize(WIDTH, HEIGHT);
+                camera.aspect = WIDTH / HEIGHT;
+                camera.updateProjectionMatrix();
+            }
+            var ambientLight, hemisphereLight, shadowLight;
+
+            function createLights() {
+                hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9);
+                ambientLight = new THREE.AmbientLight(0xdc8874, 0.6);
+                shadowLight = new THREE.DirectionalLight(0xffffff, 0.2);
+                shadowLight.position.set(150, 350, 350);
+                shadowLight.castShadow = true;
+                shadowLight.shadow.camera.left = -400;
+                shadowLight.shadow.camera.right = 400;
+                shadowLight.shadow.camera.top = 400;
+                shadowLight.shadow.camera.bottom = -400;
+                shadowLight.shadow.camera.near = 1;
+                shadowLight.shadow.camera.far = 1000;
+                shadowLight.shadow.mapSize.width = 2048;
+                shadowLight.shadow.mapSize.height = 2048;
+                scene.add(hemisphereLight);
+                scene.add(shadowLight);
+                scene.add(ambientLight);
+            }
+
+            var Fish = function() {
+                this.runningCycle = 0;
+                this.mesh = new THREE.Group();
+                this.body = new THREE.Group();
+                this.tail = new THREE.Group();
+                var tailGeom = new THREE.BoxGeometry(0.5, 20, 20);
+                tailGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -20));
+                this.tail_up = new THREE.Mesh(tailGeom, whitepinkMat);
+
+
+                this.tail.add(this.tail_up)
+                this.body.add(this.tail)
+                this.mesh.add(this.body);
+
+                this.body.rotation.y = Math.PI / 2;
+            };
+
+            Fish.prototype.run = function() {
+                this.runningCycle += 0.1;
+                this.runningCycle = this.runningCycle % (Math.PI * 2);
+                var t = this.runningCycle;
+
+                this.tail.rotation.y = Math.sin(t) / 2;
+            };
+
+            function createFish() {
+                fish = new Fish();
+                p_scale = 2.5;
+                fish.mesh.scale.set(p_scale, p_scale, p_scale);
+                scene.add(fish.mesh);
+            }
+
+            var rot = -1;
+
+            function loop() {
+                fish.run();
+                renderer.render(scene, camera);
+                requestAnimationFrame(loop);
+            }
+        </script>
+    </body>
+</html>
