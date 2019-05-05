@@ -21,7 +21,7 @@
     </head>
     <body>
         <div id="world"></div>
-        <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r104/build/three.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r98/build/three.js"></script>
         <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r104/examples/js/controls/OrbitControls.js"></script>
         <script>
             window.addEventListener("load", init, false);
@@ -123,7 +123,7 @@
                 clock = new THREE.Clock();
                 handleWindowResize();
                 var axesHelper = new THREE.AxesHelper(50);
-                scene.add( axesHelper );
+                scene.add(axesHelper);
             }
             function handleWindowResize() {
                 HEIGHT = container.offsetHeight;
@@ -159,23 +159,24 @@
                 this.body = new THREE.Group();
                 this.tail = new THREE.Group();
                 var tailGeom = new THREE.BoxGeometry(0.5, 20, 20);
-                tailGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -20));
                 this.tail_up = new THREE.Mesh(tailGeom, whitepinkMat);
-
+                this.tail_up.position.z = -10;
 
                 this.tail.add(this.tail_up)
+                this.tail.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -10));
                 this.body.add(this.tail)
                 this.mesh.add(this.body);
 
                 this.body.rotation.y = Math.PI / 2;
+
             };
 
             Fish.prototype.run = function() {
-                this.runningCycle += 0.1;
+                this.runningCycle += 0.3;
                 this.runningCycle = this.runningCycle % (Math.PI * 2);
                 var t = this.runningCycle;
 
-                this.tail.rotation.y = Math.sin(t) / 2;
+                this.tail.rotation.y = Math.sin(t - Math.PI / 2) * 0.6;
             };
 
             function createFish() {

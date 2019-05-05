@@ -122,6 +122,8 @@
                 window.addEventListener("resize", handleWindowResize, false);
                 clock = new THREE.Clock();
                 handleWindowResize();
+                var axesHelper = new THREE.AxesHelper(100);
+                scene.add(axesHelper);
             }
             function handleWindowResize() {
                 HEIGHT = container.offsetHeight;
@@ -217,38 +219,38 @@
 
                 var tailGeom = new THREE.BoxGeometry(0.5, 20, 15);
                 this.tail_up = new THREE.Mesh(tailGeom, whitepinkMat);
-                tailGeom.applyMatrix(new THREE.Matrix4().makeTranslation(0, 10, -30));
                 tailGeom.vertices[1].z -= 10;
                 tailGeom.vertices[4].z -= 10;
                 tailGeom.vertices[5].z -= 23;
                 tailGeom.vertices[0].z -= 23;
-                // this.tail_up.position.x = 0;
-                // this.tail_up.position.z = -30;
-                // this.tail_up.position.y = 10;
+                this.tail_up.position.x = 0;
+                this.tail_up.position.y = 10;
+                this.tail_up.position.z = -7.5;
                 this.tail_up.castShadow = true;
 
                 this.tail_down = this.tail_up.clone();
                 this.tail_down.rotation.z = Math.PI;
-                this.tail_down.position.y = this.tail_up.position.z / 3
+                this.tail_down.position.y = -this.tail_up.position.y;
                 this.tail_down.castShadow = true;
-
+                this.tail.add(this.tail_up);
+                this.tail.add(this.tail_down);
+                this.tail.applyMatrix(new THREE.Matrix4().makeTranslation(0, 0, -26));
 
                 this.body.add(this.eyeR);
                 this.body.add(this.hireTop);
                 this.body.add(this.handR);
                 this.body.add(this.handL);
-                this.tail.add(this.tail_up);
-                this.tail.add(this.tail_down);
                 this.body.add(this.tail)
                 this.body.add(this.torso);
                 this.mesh.add(this.body);
 
-                this.body.rotation.y = Math.PI / 2;
+                this.body.rotation.y = Math.PI / 1.15;
+
             };
 
             Fish.prototype.run = function() {
                 // var s = Math.min(1, 2);
-                this.runningCycle += 0.1;
+                this.runningCycle += 0.3;
                 this.runningCycle = this.runningCycle % (Math.PI * 2);
                 var t = this.runningCycle;
 
