@@ -128,7 +128,7 @@
                 powerField = document.getElementById("power");
 
                 scene = new THREE.Scene();
-                scene.fog = new THREE.Fog(0x652e37, 350, 500);
+                // scene.fog = new THREE.Fog(0x652e37, 350, 500);
 
                 HEIGHT = window.innerHeight;
                 WIDTH = window.innerWidth;
@@ -226,8 +226,7 @@
                 this.wingSpeed = 0.1;
                 this.isSneezing = false;
 
-                this.threegroup = new THREE.Group(); // this is a sort of container that will hold all the meshes and will be added to the scene;
-
+                this.threegroup = new THREE.Group();
                 // Materials
                 var greenMat = new THREE.MeshLambertMaterial({
                     color: 0x5da683,
@@ -444,16 +443,7 @@
                 this.head.add(this.cheekL);
                 this.head.add(this.cheekR);
                 this.head.add(this.smile);
-                /*
-  this.head.add(this.spot1);
-  this.head.add(this.spot2);
-  this.head.add(this.spot3);
-  this.head.add(this.spot4);
-  this.head.add(this.spot5);
-  this.head.add(this.spot6);
-  this.head.add(this.spot7);
-  this.head.add(this.spot8);
-  */
+
                 // legs
                 this.legFL = makeCube(greenMat, 20, 10, 20, 20, -30, 15, 0, 0, 0);
                 this.legFR = this.legFL.clone();
