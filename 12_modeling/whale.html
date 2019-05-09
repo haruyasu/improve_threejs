@@ -327,30 +327,6 @@
                 // this.pawBR.castShadow = true;
 
                 // this.body.rotation.y = Math.PI / 2;
-
-                var loader = new THREE.GLTFLoader();
-                loader.load("marmelab.gltf", function(data) {
-                    var gltf = data;
-                    var obj = gltf.scene;
-
-                    // for (var i = 0; i < obj.children.length; i++) {
-                    //     var mesh = obj.children[i];
-                    //     //console.log(i,mesh.name);
-
-                    //     if (i >= 1000) {
-                    //         if (i == 1014 || i == 1019) {
-                    //             mesh.receiveShadow = true;
-                    //         }
-                    //         mesh.castShadow = true;
-                    //     }
-                    // }
-
-                    // obj.position.set(0, 0.1, 0);
-                    obj.scale.set(2, 2, 2);
-                    this.mesh.add(obj);
-                });
-
-
             };
 
             Dog.prototype.run = function() {
