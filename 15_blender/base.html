@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Rotating mesh - WebGL experiment</title>
+        <style>
+            body {
+                background: #aaa;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container"></div>
+        <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r98/build/three.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r98/examples/js/loaders/GLTFLoader.js"></script>
+        <script>
+            var scene, camera, renderer;
+
+            var WIDTH = window.innerWidth;
+            var HEIGHT = window.innerHeight;
+
+            var SPEED = 0.01;
+
+            function init() {
+                scene = new THREE.Scene();
+
+                initMesh();
+                initCamera();
+                initLights();
+                initRenderer();
+
+                document.body.appendChild(renderer.domElement);
+            }
+
+            function initCamera() {
+                camera = new THREE.PerspectiveCamera(70, WIDTH / HEIGHT, 1, 10);
+                camera.position.set(0, 3.5, 5);
+                camera.lookAt(scene.position);
+            }
+
+            function initRenderer() {
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setSize(WIDTH, HEIGHT);
+            }
+
+            function initLights() {
+                var light = new THREE.AmbientLight(0xffffff);
+                scene.add(light);
+            }
+
+            var mesh = null;
+            function initMesh() {
+                var loader = new THREE.GLTFLoader();
+                loader.load("marmelab.gltf", function(data) {
+                    var gltf = data;
+                    var obj = gltf.scene;
+
+                    for (var i = 0; i < obj.children.length; i++) {
+                        var mesh = obj.children[i];
+                        //console.log(i,mesh.name);
+
+                        if (i >= 1000) {
+                            if (i == 1014 || i == 1019) {
+                                mesh.receiveShadow = true;
+                            }
+                            mesh.castShadow = true;
+                        }
+                    }
+
+                    obj.position.set(0, 0.1, 0);
+                    obj.scale.set(20, 2, 2);
+                    scene.add(obj);
+                });
+            }
+
+            function rotateMesh() {
+                if (!mesh) {
+                    return;
+                }
+
+                mesh.rotation.x -= SPEED * 2;
+                mesh.rotation.y -= SPEED;
+                mesh.rotation.z -= SPEED * 3;
+            }
+
+            function render() {
+                requestAnimationFrame(render);
+                // rotateMesh();
+                renderer.render(scene, camera);
+            }
+
+            init();
+            render();
+        </script>
+    </body>
+</html>
