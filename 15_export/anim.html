@@ -27,6 +27,8 @@
         <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r98/examples/js/WebGL.js"></script>
         <script>
             window.addEventListener("load", init, false);
+            var mixers = [];
+            var clock = new THREE.Clock();
 
             function init(event) {
                 initScreenAnd3D();
@@ -111,13 +113,21 @@
 
             function createObj() {
                 var loader = new THREE.GLTFLoader();
-                loader.load("houdini.glb", function(gltf) {
+                // loader.load("bird.glb", function(gltf) {
+                loader.load("../models/gltf/parrot.glb", function(gltf) {
                     obj = gltf.scene.children[0];
                     scene.add(obj);
+                    mixer = new THREE.AnimationMixer(obj);
+                    mixer.clipAction(gltf.animations[0]).setDuration(1).play();
+                    mixers.push(mixer);
                 });
             }
 
             function loop() {
+                var delta = clock.getDelta();
+                for (var i = 0; i < mixers.length; i++) {
+                    mixers[i].update(delta);
+                }
                 renderer.render(scene, camera);
                 requestAnimationFrame(loop);
             }
